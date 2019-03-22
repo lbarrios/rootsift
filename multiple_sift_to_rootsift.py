@@ -3,7 +3,7 @@ import sys
 import subprocess
 import os
 
-cmd = "python single_sift_to_rootsift.py"
+cmd = "./single_sift_to_rootsift.py"
 
 if len(sys.argv)<3:
 	print("Usage: " + sys.argv[0] + " image_number_start image_number_end")
@@ -27,5 +27,6 @@ for image_number in range(image_number_start, image_number_end+1):
 	image_path = dataset_path + image_file
 	if not os.path.isfile(image_path):
 		continue
+	print("running %s %s"%(cmd, image_path))
 	subprocess.run([cmd, image_path])
 	print("Image number %s converted from sift to rootsift."%image_number)

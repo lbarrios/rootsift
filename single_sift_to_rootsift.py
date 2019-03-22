@@ -19,12 +19,13 @@ if len(sys.argv)<2:
 	exit()
 
 # parse arguments
-image_number = int(sys.argv[1])
-if os.path.isfile(image_number):
+image_arg = sys.argv[1]
+if os.path.isfile(image_arg):
 	# Full path
-	sift_path = image_number
+	sift_path = image_arg
 	rootsift_path = sift_path + ".rootsift"
 else:
+	image_number = int(image_arg)
 	# Inria dataset
 	if(image_number < 100000 or image_number > 149902):
 		print("ERROR: image_number needs to be from 100000 to 149902")
@@ -51,4 +52,5 @@ descs = np.asarray(descs_list, dtype=np.float)
 descs /= (descs.sum(axis=1, keepdims=True) + eps)
 descs = np.sqrt(descs)
 
-np.save(rootsift_path, descs)
+np.savetxt(rootsift_path, descs)
+print("Converted %s to %s"%(sift_path, rootsift_path))
