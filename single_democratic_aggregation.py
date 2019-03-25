@@ -42,12 +42,36 @@ else:
 descs = np.loadtxt(rootsift_path)
 print("loaded image %s rootsift descriptors (%s)"%(image_arg, len(descs)))
 
-# compute C the set of representative anchor points using kmeans
+# compute C, the set of representative anchor points using kmeans
 kmeans = KMeans(n_clusters=N_CLUSTERS).fit(descs)
 C = kmeans.cluster_centers_
-print(C)
 
 # compute the normalized residual vectors
-for cj in C:
-	xcj = descs-cj
-	rj = normalize(xcj, axis=1)#, norm='l2')
+R = [np.zeros((len(descs[0]),len(C))) for x in descs]
+for i in range(len(C)):
+	XCi = descs-C[i]
+	Ri = normalize(XCi, axis=1)#, norm='l2')
+	# for every image, complete the "i" residual vector
+	for j in range(len(descs)):
+		R[j][:,i] = Ri[i]
+
+# # compute the normalized residual vectors
+# R = [np.zeros((len(C), len(descs[0]))) for x in descs]
+# for i in range(len(C)):
+# 	XCi = descs-C[i]
+# 	Ri = normalize(XCi, axis=1)#, norm='l2')
+# 	# for every image, complete the "i" residual vector
+# 	for j in range(len(descs)):
+# 		R[j][i] = Ri[i]
+
+tembedding=list()
+i = 0
+for Rj in R:
+	i += 1
+	mean = np.mean(Rj)
+	cov = np.cov(Rj)
+	tembedding.append(scipy.linalg.sqrtm(cov).dot((Rj-mean)))
+	if i%50 == 0:
+		print("%s/%s"%(i,len(R)))
+
+print(tembedding)
